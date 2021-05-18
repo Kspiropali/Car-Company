@@ -23,7 +23,7 @@ public class CarToRent extends Car
         totalAccum = 0;
     }
 
-    public String getrentalDate()
+    public String getRentalDate()
     {
         //accessor method for the car's Rental Date
         return rentalDate;
@@ -117,8 +117,6 @@ public class CarToRent extends Car
         rentalDate = "dd/MM/yyyy";
         returnDate = "dd/MM/yyyy";
         onLoan = false;
-        JOptionPane.showInternalMessageDialog(null, "You have successfully returned Car Number: " + carNumber,
-					"Success!", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void getDescNTotal()
@@ -142,7 +140,8 @@ public class CarToRent extends Car
         }
     }
     
-  //@Override
+    //giving the display option proper format for the CarToRent Objects
+    @Override
   	public String toString() {	
   		if(custName == "" || rentalDate == "dd/MM/yyyy" || returnDate == "dd/MM/yyyy")
   		{

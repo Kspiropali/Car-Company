@@ -61,7 +61,7 @@ public class CarToBuy extends Car
 
     public int buyCar(String name)
     {
-        //checking if car is sold
+        //returning a value to prevent a dialogue displaying when car not available @line 192,Gui.java
         if(sold == true){
         	JOptionPane.showInternalMessageDialog(null, "This Car is already brought",
 					"WARNING", JOptionPane.WARNING_MESSAGE);
@@ -85,7 +85,8 @@ public class CarToBuy extends Car
         }
     }
     
-	//@Override
+  //giving the display option proper format for the CarToBuy Objects
+	@Override
 	public String toString() {	
 		if(sold == false)
 		{

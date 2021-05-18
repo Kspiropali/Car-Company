@@ -5,10 +5,10 @@
  */
 public class Car
 {
-    // instance variables of Customer Name and  Car description, had to make it public so as to access them from the subclasses
+    // instance variables of Customer Name and  Car description, protected so children inherit them
     protected String custName;
 	protected String carDesc;
-    private static int numberGenerator = 0;
+    private static int numberGenerator = 0;//proper way of a number generator
     protected int carNumber = numberGenerator++;
 
     //constructor

@@ -2,7 +2,6 @@
 //i read that by not importing the whole java libraries 
 //compilation time might differ but again, i did not notice a difference
 import java.awt.Color;
-import java.awt.Label;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,13 +29,13 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-public class Gui implements ActionListener{
+public class CarCompany implements ActionListener{
 	private final ImageIcon imageIcon = new ImageIcon();//image handler
 	private JFrame frame;
 	private JMenuBar menuBar;
 	private JMenu menuBarFile;
 	private JTextPane price, mileAge, description, adminFee, dailyRate, customerName, carNumber;
-	private JMenuItem menuItemSave, menuItemAbout, menuItemExit;
+	private JMenuItem menuItemSave, menuItemClearTerminal, menuItemAbout, menuItemExit;
 	private JLabel priceText, yearText, descriptionText, mileAgeText, adminFeeText, dailyRateText, customerNameText, rentalDateText, returnDateText, numberOfDaysText, carNumberText; 
 	private JSpinner year, numberOfDays;
 	private JButton addCarToBuy, addCarToRent, buyCar, rentCar, returnCar, displayAll, clearFields;
@@ -44,7 +43,7 @@ public class Gui implements ActionListener{
 	ArrayList<Car> cars = new ArrayList<Car>();
 		
 	
-	public Gui() {
+	public CarCompany() {
 		imageIcon.setImage(Toolkit.getDefaultToolkit().getImage("image.jpg"));//setting image up
 		
 		//setting up the frame, decorations,  etc
@@ -100,87 +99,83 @@ public class Gui implements ActionListener{
 									}catch (Exception e) {
 										e.printStackTrace();		
 									}					break;
+		case "Clear Terminal" :clearTerminalFunction();	break;
 		case "About"          : aboutFunction();		break;
 		case "Exit"           : exitFunction();			break;
 		}
 	}
 	
 	public void addCarToBuyFunction(){
+		int finalPrice, finalMileAge, finalyear;
+		String finalDescription = description.getText();
 		
 		//doing a second round of checks because if an invalid number is entered and the button is pressed without losing focus it crashes...
 		try {
-			Integer.parseUnsignedInt(price.getText());
-			Integer.parseUnsignedInt(mileAge.getText());
-			description.getText();
-		}catch (NumberFormatException ex){
-				clearFieldsFunction();	
+			finalPrice = Integer.parseUnsignedInt(price.getText());
+			finalMileAge = Integer.parseUnsignedInt(mileAge.getText());
+			finalyear = (Integer)year.getValue();
+		}catch (NumberFormatException ex){	
 				return;
         }
-		
-		JOptionPane.showInternalMessageDialog(null, "Successfully entered a Car to Buy in the Database!",
-				"Success", JOptionPane.INFORMATION_MESSAGE);
-		
 		clearFieldsFunction();//defaulting the values in the fields
 
 		//creating the object(CarToBuy) and adding it in the Arraylist
-		Car newcar = new CarToBuy(description.getText(), Integer.parseUnsignedInt(price.getText()), (Integer)year.getValue(), Integer.parseUnsignedInt(mileAge.getText()));
+		Car newcar = new CarToBuy(finalDescription, finalPrice, finalyear, finalMileAge);
 		cars.add(newcar);
+		
+		JOptionPane.showInternalMessageDialog(null, "Successfully entered a Car to Buy in the Database!",
+				"Success", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	public void addCarToRentFunction(){
+		int finaladminFee, finalDailyRate;
+		String finalDescription = description.getText();
+		
 		//doing a second round of checks because if an invalid number is entered and the button is pressed without losing focus it crashes...
 		try {
-			Integer.parseUnsignedInt(adminFee.getText());
-			Integer.parseUnsignedInt(dailyRate.getText());
-			description.getText();
+			finaladminFee = Integer.parseUnsignedInt(adminFee.getText());
+			finalDailyRate = Integer.parseUnsignedInt(dailyRate.getText());
 		}catch (NumberFormatException ex){
-				clearFieldsFunction();	
 				return;
         }
-		
-		JOptionPane.showInternalMessageDialog(null, "Successfully entered a Car to Rent in the Database!",
-				"Success", JOptionPane.INFORMATION_MESSAGE);
 		
 		clearFieldsFunction();//defaulting the values in the fields
 		
 		//creating the object(CarToRent) and adding it in the Arraylist
-		Car newcar = new CarToRent(description.getText(), Integer.parseUnsignedInt(dailyRate.getText()), Integer.parseUnsignedInt(adminFee.getText()));
+		Car newcar = new CarToRent(finalDescription, finalDailyRate, finaladminFee);
 		cars.add(newcar);
+		
+		JOptionPane.showInternalMessageDialog(null, "Successfully entered a Car to Rent in the Database!",
+				"Success", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	public void buyCarFunction(){
+		int finalCarNumber;
 		//doing a second round of checks because if an invalid number is entered and the button is pressed without losing focus it crashes...
 		try {
-			Integer.parseUnsignedInt(carNumber.getText());//parsing as unsigned cuz we dont want value to be -1 nor <0 cuz of arraylist
+			finalCarNumber = Integer.parseUnsignedInt(carNumber.getText());//parsing as unsigned cuz we dont want value to be -1 nor <0 cuz of arraylist
 		}catch (NumberFormatException ex){
-			clearFieldsFunction();	
 			return;
         }
-		
-		if(Integer.parseUnsignedInt(carNumber.getText()) != -1)
-		{
-			CarToBuy broughtCar;
+			
 			int check;
+			String finalCustomerText = customerName.getText();
+			CarToBuy broughtCar;
 
+			clearFieldsFunction();//cleaning the workspace now
 			//checking if we can actually buy the car, is it CarToBuy or CarToRent object, if it exists as well
 			try {
-				broughtCar = (CarToBuy) cars.get(Integer.parseInt(carNumber.getText()));
-				check = broughtCar.buyCar(customerName.getText());
+				broughtCar = (CarToBuy) cars.get(finalCarNumber);
+				check = broughtCar.buyCar(finalCustomerText);
 			}catch(IndexOutOfBoundsException e)
 			{
 				JOptionPane.showInternalMessageDialog(null, "This Car does not exist in our database BUY",
 						"WARNING!", JOptionPane.WARNING_MESSAGE);
-				clearFieldsFunction();
 				return;
 			}catch(ClassCastException c)
 			{
 				JOptionPane.showInternalMessageDialog(null, "You cant buy a Car to be rented",
 						"WARNING!", JOptionPane.WARNING_MESSAGE);
-				clearFieldsFunction();
-				return;
-			}catch(NumberFormatException x)
-			{
-				clearFieldsFunction();
 				return;
 			}
 			
@@ -189,72 +184,76 @@ public class Gui implements ActionListener{
 				JOptionPane.showInternalMessageDialog(null, "Car has been successfully brought by: "+ customerName.getText(),
 						"Car added", JOptionPane.INFORMATION_MESSAGE);
 			}
-					
-		}
 		
 	}
 		
 	public void rentCarFunction(){
-		CarToRent rentCar;
+		int finalCarNumber;
+		
 		//doing a second round of checks because if an invalid number is entered and the button is pressed without losing focus it crashes...
 		try {
-			Integer.parseUnsignedInt(adminFee.getText());//usually i would run 3 ifs for
-			Integer.parseUnsignedInt(dailyRate.getText());//these but also the other variables
-			Integer.parseUnsignedInt(carNumber.getText());//but since we can parse it, its better
+			finalCarNumber = Integer.parseUnsignedInt(carNumber.getText());//but since we can parse it, its better
 		}catch (NumberFormatException ex){
-			clearFieldsFunction();
+			//the focusExit listener will handle this
 			return;
         }
-		//also checking the object type, or if a drunk user entered the letter F for the price for example		
+		
+		CarToRent rentCar;
+		int finalNumberOfDays = (Integer)numberOfDays.getValue();
+		String finalCustomerName = customerName.getText(), finalRentalDate = rentalDate.getText(), finalReturnDate = returnDate.getText();
+		
+		clearFieldsFunction();
+		
+		//also checking the object type	
 		try {
-			rentCar = (CarToRent) cars.get(Integer.parseInt(carNumber.getText()));
-			rentCar.rentCar(customerName.getText(), rentalDate.getText(), returnDate.getText(), (Integer)numberOfDays.getValue());
+			rentCar = (CarToRent) cars.get(finalCarNumber);
+			rentCar.rentCar(finalCustomerName, finalRentalDate, finalReturnDate, finalNumberOfDays);
 		}catch(IndexOutOfBoundsException e)
 		{
 			JOptionPane.showInternalMessageDialog(null, "This Car does not exist in our database RENT",
 					"WARNING!", JOptionPane.WARNING_MESSAGE);
-			clearFieldsFunction();
+			carNumber.setText("0");
 			return;
 		}catch(ClassCastException c)
 		{
 			JOptionPane.showInternalMessageDialog(null, "You cant buy a Car to be sold",
 					"WARNING!", JOptionPane.WARNING_MESSAGE);
-			clearFieldsFunction();
+			carNumber.setText("0");
 			return;
 		}
-		catch (NumberFormatException ex){
-			clearFieldsFunction();	
-			return;
-        }
 	}
 	
 	public void returnCarFunction(){
-		CarToRent returnCar;
+		int finalCarNumber;
 		
 		try {
 			//parsing as unsigned, we dont want -1 neither <0 so must be positive = Unsigned, also more room for new cars
-			Integer.parseUnsignedInt(carNumber.getText());//not that we have 2^32-1 but oh well
+			finalCarNumber = Integer.parseUnsignedInt(carNumber.getText());//not that we have 2^32-1 but oh well
 		}catch (NumberFormatException ex){
-			clearFieldsFunction();
 			return;
         }
 		
+		CarToRent returnCar;
+		
 		try {
-			returnCar = (CarToRent) cars.get(Integer.parseInt(carNumber.getText()));
+			returnCar = (CarToRent) cars.get(finalCarNumber);
 			returnCar.carReturn();
 		}catch(IndexOutOfBoundsException e)
 		{
-			JOptionPane.showInternalMessageDialog(null, "This Car does not exist in our database RETURN",
+			JOptionPane.showInternalMessageDialog(null, "This Car does not exist in our database RENTED",
 					"WARNING!", JOptionPane.WARNING_MESSAGE);
-			clearFieldsFunction();
+			carNumber.setText("0");
 			return;
 		}catch(ClassCastException x)
 		{
 			JOptionPane.showInternalMessageDialog(null, "This is not a rental car, please try again",
 					"WARNING!", JOptionPane.WARNING_MESSAGE);
-			clearFieldsFunction();
+			carNumber.setText("0");
 			return;
 		}
+		
+		JOptionPane.showInternalMessageDialog(null, "Car number: "+carNumber.getText()+" is now available for rent!",
+				"NOTICE!", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	public void displayAllFunction(){
@@ -264,11 +263,20 @@ public class Gui implements ActionListener{
 					"WARNING!", JOptionPane.WARNING_MESSAGE);
 					return;
 		}
+		
+		System.out.println( " ______"+"        ______"+"        ______"+"        ______\n"+//Full credit at this guy: Art by Hayley Jane Wakenshaw
+							"/|_||_\\`.__"+"   /|_||_\\`.__"+"   /|_||_\\`.__"+"   /|_||_\\`.__\n"+//at this site https://www.asciiart.eu/vehicles/cars
+							"(   _    _ _\\"+" (   _    _ _\\"+" (   _    _ _\\"+" (   _    _ _\\\n"+//i tried for 30 mins to draw one
+							"=`-(_)--(_)-'"+" =`-(_)--(_)-'"+" =`-(_)--(_)-'"+" =`-(_)--(_)-'");//without success -_-		
 
 		for(Car car: cars)
 		{
 			System.out.println(car.toString());
 		}
+		 System.out.println( " ______"+"        ______"+"        ______"+"        ______\n"+//Full credit at this guy: Art by Hayley Jane Wakenshaw
+				 			 "/|_||_\\`.__"+"   /|_||_\\`.__"+"   /|_||_\\`.__"+"   /|_||_\\`.__\n"+//at this site https://www.asciiart.eu/vehicles/cars
+				 			 "(   _    _ _\\"+" (   _    _ _\\"+" (   _    _ _\\"+" (   _    _ _\\\n"+//i tried for 30 mins to draw one
+				 			 "=`-(_)--(_)-'"+" =`-(_)--(_)-'"+" =`-(_)--(_)-'"+" =`-(_)--(_)-'\n\n");//without success -_-
 	}
 	
 	public void clearFieldsFunction(){
@@ -287,9 +295,16 @@ public class Gui implements ActionListener{
 	}
 	
 	public void saveFunction() throws Exception{
+		//checking if arraylist is empty
+		if(cars.isEmpty() == true)
+		{
+			JOptionPane.showInternalMessageDialog(null, "Arraylist is Empty, aborting...",
+					"WARNING!", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
 		//saving the objects as string in a file
         File file = new File(new File("information.txt").getAbsolutePath());
-        
+       
         try
         {
         	if (file.createNewFile()) 
@@ -324,22 +339,19 @@ public class Gui implements ActionListener{
         
         for(Car car: cars)
 		{
-			if(car.getClass() == CarToBuy.class)
-			{
-				myWriter.write("\n"+car.toString()+"\n");
-			}
-			else
-			{
-				myWriter.write("\n"+car.toString()+"\n");
-			}
+        	myWriter.write("\n"+car.toString()+"\n");
 		}
         
         myWriter.close();//properly closing it
 	}
 	
+	public void clearTerminalFunction() {
+		for (int i = 0; i < 50; ++i) System.out.println();
+	}
+	
 	public void aboutFunction(){
 		//cosmetic
-		JOptionPane.showInternalMessageDialog(null, "This is a handy car program used to lists cars to be brought/rent and sells them/rents them to customers",
+		JOptionPane.showInternalMessageDialog(null, "This is a handy car program used to lists cars to be brought/rent and sells them/rents them to customers\nVersion: 3.14159265359",
 				"About", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
@@ -354,9 +366,9 @@ public class Gui implements ActionListener{
 		}
 	}
 	
-	
+	//start of program
 	public static void main(String[] args) {	
-		//start of program
+		
 
 		//trying to set default lookandfeel(metal for windows, gtk for linux or for Mac depends on the vendor)
 		try {
@@ -377,7 +389,7 @@ public class Gui implements ActionListener{
 			System.out.println("Warning, default look in place of os");
 		}
        
-		new Gui();//Gui test = new Gui() alternative, since test not needed...
+		new CarCompany();//CarCompany test = new CarCompany() alternative, since test not needed...
    }
 	
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -388,6 +400,7 @@ public class Gui implements ActionListener{
 	{
 	//menubar and all of its children
 		menuBar = new JMenuBar();
+		menuBar.setBorderPainted(false);
 		menuBar.setBounds(0, 0, 561, 20);
 		frame.getContentPane().add(menuBar);
 		menuBar.setBackground(Color.DARK_GRAY);
@@ -395,12 +408,23 @@ public class Gui implements ActionListener{
 		menuBarFile.setForeground(Color.WHITE);
 		menuBar.add(menuBarFile);
 		menuItemSave = new JMenuItem("Save");
+		menuItemSave.setForeground(Color.LIGHT_GRAY);
+		menuItemSave.setBackground(Color.DARK_GRAY);
 		menuBarFile.add(menuItemSave);
 		menuItemSave.addActionListener(this);
+		menuItemClearTerminal = new JMenuItem("Clear Terminal");
+		menuItemClearTerminal.setForeground(Color.LIGHT_GRAY);
+		menuItemClearTerminal.setBackground(Color.DARK_GRAY);
+		menuBarFile.add(menuItemClearTerminal);
+		menuItemClearTerminal.addActionListener(this);
 		menuItemAbout = new JMenuItem("About");
+		menuItemAbout.setForeground(Color.LIGHT_GRAY);
+		menuItemAbout.setBackground(Color.DARK_GRAY);
 		menuBarFile.add(menuItemAbout);
 		menuItemAbout.addActionListener(this);
 		menuItemExit = new JMenuItem("Exit");
+		menuItemExit.setForeground(Color.LIGHT_GRAY);
+		menuItemExit.setBackground(Color.DARK_GRAY);
 		menuBarFile.add(menuItemExit);
 		menuItemExit.addActionListener(this);
 	}
@@ -481,11 +505,11 @@ public class Gui implements ActionListener{
 	public void drawAddCarToBuyButton() {
 		//addcartobuy button and its configurations
 		addCarToBuy = new JButton("Add Car To Buy");
-		addCarToBuy.setToolTipText("Red = Mandatory");
+		addCarToBuy.setToolTipText("Red is Mandatory, Green is Optional");
 		addCarToBuy.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				descriptionText.setForeground(Color.red);
+				descriptionText.setForeground(Color.green);
 				priceText.setForeground(Color.red);
 				yearText.setForeground(Color.red);
 				mileAgeText.setForeground(Color.red);
@@ -558,6 +582,7 @@ public class Gui implements ActionListener{
 	public void drawAddCarToRentButton(){
 			//addcartorent button and its configurations
 			addCarToRent = new JButton("Add Car To Rent");
+			addCarToRent.setToolTipText("Red is Mandatory, Green is Optional");
 			addCarToRent.setFocusPainted(false);
 			addCarToRent.setBorderPainted(false);
 			addCarToRent.setForeground(Color.WHITE);
@@ -568,7 +593,7 @@ public class Gui implements ActionListener{
 			addCarToRent.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					descriptionText.setForeground(Color.red);
+					descriptionText.setForeground(Color.green);
 					adminFeeText.setForeground(Color.red);
 					dailyRateText.setForeground(Color.red);
 				}
@@ -655,6 +680,7 @@ public class Gui implements ActionListener{
 	public void drawBuyCarButton(){
 			//buycar button with its configurations
 			buyCar = new JButton("Buy Car");
+			buyCar.setToolTipText("Red is Mandatory, Green is Optional");
 			buyCar.setFocusPainted(false);
 			buyCar.setBorderPainted(false);
 			buyCar.setBorder(null);
@@ -666,7 +692,7 @@ public class Gui implements ActionListener{
 			buyCar.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					customerNameText.setForeground(Color.red);
+					customerNameText.setForeground(Color.green);
 					carNumberText.setForeground(Color.red);
 				}
 				@Override
@@ -680,6 +706,7 @@ public class Gui implements ActionListener{
 	public void drawRentCarButton(){
 			//rentcar button with its configurations
 			rentCar = new JButton("Rent Car");
+			rentCar.setToolTipText("Red is Mandatory, Green is Optional");
 			rentCar.setFocusPainted(false);
 			rentCar.setBorderPainted(false);
 			rentCar.setForeground(Color.WHITE);
@@ -690,7 +717,7 @@ public class Gui implements ActionListener{
 			rentCar.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					customerNameText.setForeground(Color.red);
+					customerNameText.setForeground(Color.green);
 					rentalDateText.setForeground(Color.red);
 					returnDateText.setForeground(Color.red);
 					numberOfDaysText.setForeground(Color.red);
@@ -710,6 +737,7 @@ public class Gui implements ActionListener{
 	public void drawReturnCarTextNField(){
 			//returncar button with its configurations
 			returnCar = new JButton("Return Car");
+			returnCar.setToolTipText("Red is Mandatory");
 			returnCar.setFocusPainted(false);
 			returnCar.setBorderPainted(false);
 			returnCar.setForeground(Color.WHITE);
@@ -756,19 +784,5 @@ public class Gui implements ActionListener{
 		iconLabel.setBackground(Color.LIGHT_GRAY);
 		iconLabel.setBounds(0, 0, 561, 399);
 		frame.getContentPane().add(iconLabel);
-		
-		//since the icon was downscaled, greyscaled, downbrighted by a lot, some areas were left white and thus not that good(to my eyes, I prefer dark mode)
-		Label bottomRepaintLabel = new Label();
-		bottomRepaintLabel.setBackground(Color.BLACK);
-		bottomRepaintLabel.setBounds(0, 396, 597, 9);
-		frame.getContentPane().add(bottomRepaintLabel);
-		Label leftRepaintLabel = new Label();
-		leftRepaintLabel.setBackground(Color.BLACK);
-		leftRepaintLabel.setBounds(554, 0, 7, 399);
-		frame.getContentPane().add(leftRepaintLabel);
-		Label rightRepaintLabel = new Label();
-		rightRepaintLabel.setBackground(Color.BLACK);
-		rightRepaintLabel.setBounds(0, 10, 6, 389);
-		frame.getContentPane().add(rightRepaintLabel);
 	}
 }
